@@ -16,8 +16,8 @@ services:
      build: .
      depends_on:
      - db
-     environment:
-     DATABASE_URL:
+    
+    
 volumes:
   db: {}
     
