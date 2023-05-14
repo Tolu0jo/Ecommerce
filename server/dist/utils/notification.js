@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.emailHtml = exports.sendEmail = exports.GenerateOtp = void 0;
+exports.emailForgotPassword = exports.emailHtml = exports.sendEmail = exports.GenerateOtp = void 0;
 const nodemailer_1 = __importDefault(require("nodemailer"));
 const config_1 = require("../config");
 const GenerateOtp = () => {
@@ -49,7 +49,7 @@ const sendEmail = (from, to, subject, html) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.sendEmail = sendEmail;
-const emailHtml = (otp, salt) => {
+const emailHtml = (otp) => {
     const temp = `
     <div style="max-width:700px; font-size:110%; border:10px solid red;
     padding:50px 20px; margin:auto; text-align:center; ">
@@ -57,10 +57,20 @@ const emailHtml = (otp, salt) => {
     Welcome to Ecommerce
     </h2>
     <p> Hi there, your otp is ${otp}, expires in 5min</p>
-    <a href="http://localhost:5000/login/${salt}">or click Verification link</a>
     </div>
    
     `;
     return temp;
 };
 exports.emailHtml = emailHtml;
+const emailForgotPassword = (otp) => {
+    const temp = `
+    <div style="max-width:700px; font-size:110%; border:10px solid red;
+    padding:50px 20px; margin:auto; text-align:center; ">
+    <p> Hi there, your otp is ${otp}, expires in 5min</p>
+    </div>
+   
+    `;
+    return temp;
+};
+exports.emailForgotPassword = emailForgotPassword;

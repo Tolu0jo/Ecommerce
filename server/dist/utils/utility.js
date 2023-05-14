@@ -12,9 +12,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.HashedPassword = exports.GenerateSalt = exports.option = exports.registerSchema = void 0;
+exports.GenerateSignature = exports.HashedPassword = exports.GenerateSalt = exports.option = exports.registerSchema = void 0;
 const joi_1 = __importDefault(require("joi"));
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const config_1 = require("../config");
 exports.registerSchema = joi_1.default.object().keys({
     email: joi_1.default.string().required(),
     password: joi_1.default.string().required().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
@@ -39,3 +41,7 @@ const HashedPassword = (password, salt) => __awaiter(void 0, void 0, void 0, fun
     return yield bcryptjs_1.default.hash(password, salt);
 });
 exports.HashedPassword = HashedPassword;
+const GenerateSignature = (email) => __awaiter(void 0, void 0, void 0, function* () {
+    return jsonwebtoken_1.default.sign(email, config_1.JWT_SECRET);
+});
+exports.GenerateSignature = GenerateSignature;

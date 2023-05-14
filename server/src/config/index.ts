@@ -21,4 +21,5 @@ export const BREVO_HOST = process.env.BREVO_HOST as string
 export const BREVO_PORT = Number(process.env.BREVO_PORT)
 export const FROM_ADMIN_MAIL = process.env.FROM_ADMIN_MAIL as string
 export const MAIL_SUBJECT = process.env.MAIL_SUBJECT as string
+export const JWT_SECRET = process.env.JWT_SECRET as string
 

@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.MAIL_SUBJECT = exports.FROM_ADMIN_MAIL = exports.BREVO_PORT = exports.BREVO_HOST = exports.BREVO_PASSWORD = exports.BREVO_USER = void 0;
+exports.JWT_SECRET = exports.MAIL_SUBJECT = exports.FROM_ADMIN_MAIL = exports.BREVO_PORT = exports.BREVO_HOST = exports.BREVO_PASSWORD = exports.BREVO_USER = void 0;
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 // const db_host = String(process.env.DB_HOST)
@@ -25,3 +25,4 @@ exports.BREVO_HOST = process.env.BREVO_HOST;
 exports.BREVO_PORT = Number(process.env.BREVO_PORT);
 exports.FROM_ADMIN_MAIL = process.env.FROM_ADMIN_MAIL;
 exports.MAIL_SUBJECT = process.env.MAIL_SUBJECT;
+exports.JWT_SECRET = process.env.JWT_SECRET;

@@ -40,7 +40,7 @@ export const sendEmail = async(
     }
 }
 
-export const emailHtml =(otp:number,salt:string)=>{
+export const emailHtml =(otp:number)=>{
     const temp = 
     `
     <div style="max-width:700px; font-size:110%; border:10px solid red;
@@ -49,7 +49,18 @@ export const emailHtml =(otp:number,salt:string)=>{
     Welcome to Ecommerce
     </h2>
     <p> Hi there, your otp is ${otp}, expires in 5min</p>
-    <a href="http://localhost:5000/login/${salt}">or click Verification link</a>
+    </div>
+   
+    `
+    return temp
+}
+
+export const emailForgotPassword=(otp:number)=>{
+    const temp = 
+    `
+    <div style="max-width:700px; font-size:110%; border:10px solid red;
+    padding:50px 20px; margin:auto; text-align:center; ">
+    <p> Hi there, your otp is ${otp}, expires in 5min</p>
     </div>
    
     `

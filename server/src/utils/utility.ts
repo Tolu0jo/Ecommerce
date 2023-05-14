@@ -1,5 +1,7 @@
 import Joi from "joi";
 import bcrypt from "bcryptjs"
+import jwt, { JwtPayload } from "jsonwebtoken"
+import { JWT_SECRET } from "../config";
 
 export  const registerSchema =Joi.object().keys({
     email: Joi.string().required(),
@@ -25,4 +27,8 @@ export const GenerateSalt = async()=>{
 
 export const HashedPassword = async(password:string,salt:string)=>{
     return await bcrypt.hash(password,salt)
+}
+
+export const GenerateSignature = async(email:string)=>{
+ return jwt.sign(email,JWT_SECRET) as unknown as JwtPayload
 }

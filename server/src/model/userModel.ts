@@ -2,22 +2,22 @@ import { DataTypes, Model } from "sequelize";
 //import { db } from "../config";
 import { sequelize } from "../config/db";
 
-// export interface UserAttributes {
-//   id: string;
-//   email: string;
-//   password: string;
-//   firstName: string;
-//   lastName: string;
-//   address: string;
-//   phone: string;
-//   otp: number;
-//   otp_expiry: Date;
-//   lng: number;
-//   lat: number;
-//   verified: boolean;
-//   salt: string;
-//   role: string;
-// }
+export interface UserAttributes {
+  id: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  address: string;
+  phone: string;
+  otp: number;
+  otp_expiry: Date;
+  lng: number;
+  lat: number;
+  verified: boolean;
+  salt: string;
+  role: string;
+}
 
 // export class UserInstance extends Model<UserAttributes> {}
 const UserModel= sequelize.define('User',
