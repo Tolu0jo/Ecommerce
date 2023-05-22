@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.postForgotPassword = exports.verifyUserOtp = exports.SignUp = void 0;
+exports.userLogin = exports.postForgotPassword = exports.verifyUserOtp = exports.SignUp = void 0;
 const utility_1 = require("../utils/utility");
 const utility_2 = require("../utils/utility");
 const notification_1 = require("../utils/notification");
@@ -151,3 +151,37 @@ const postForgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
     }
 });
 exports.postForgotPassword = postForgotPassword;
+//============================ LOGIN ===========================//
+const userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { email, password } = req.body;
+        //joi validation
+        const user = yield userModel_1.default.findOne({ where: { email } });
+        if (user.verified) {
+            const validated = yield (0, utility_1.validatePassword)(password, user.password, user.salt);
+            if (validated) {
+                const signature = yield (0, utility_1.GenerateSignature)({
+                    id: user.id,
+                    email
+                });
+                return res.status(200).json({ message: "User successfully login",
+                    signature,
+                    role: user.role
+                });
+            }
+        }
+        else {
+            return res.status(401).json({
+                Error: "User not verified"
+            });
+        }
+        return res.status(404).json({
+            Error: "User does not exist"
+        });
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ Error: "Internal Server Error" });
+    }
+});
+exports.userLogin = userLogin;

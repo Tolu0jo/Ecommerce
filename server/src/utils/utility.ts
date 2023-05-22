@@ -28,7 +28,15 @@ export const GenerateSalt = async()=>{
 export const HashedPassword = async(password:string,salt:string)=>{
     return await bcrypt.hash(password,salt)
 }
+interface Ipayload{
+    email:string;
+    id:string
+}
 
-export const GenerateSignature = async(email:string)=>{
- return jwt.sign(email,JWT_SECRET) as unknown as JwtPayload
+export const GenerateSignature = async(payload:Ipayload)=>{
+ return jwt.sign(payload,JWT_SECRET) as unknown as JwtPayload
+}
+
+export const validatePassword = async(enteredPassword:string, savedPassword: string, salt:string)=>{
+    return await HashedPassword(enteredPassword,salt) === savedPassword
 }

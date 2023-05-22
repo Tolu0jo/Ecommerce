@@ -4,6 +4,7 @@ import {
   HashedPassword,
   registerSchema,
   GenerateSignature,
+  validatePassword,
 } from "../utils/utility";
 import { option } from "../utils/utility";
 import {
@@ -90,7 +91,7 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
     const user = (await UserModel.findOne({
       where: { email },
     })) as unknown as UserAttributes;
-    if (user) {
+    if (user ) {
       if (user.otp === parseInt(otp) && user.otp_expiry >= new Date()) {
         const updateUser = (await UserModel.update(
           {
@@ -165,3 +166,38 @@ export const postForgotPassword = async (req: Request, res: Response) => {
     });
   }
 };
+
+//============================ LOGIN ===========================//
+export const userLogin =async (req:Request, res:Response) => {
+try {
+  const {email,password}=req.body;
+  //joi validation
+  const user = await UserModel.findOne({where:{email}}) as unknown as UserAttributes
+ 
+  if(user.verified) {
+  const validated = await validatePassword(password,user.password,user.salt)
+if(validated){
+  const signature =await GenerateSignature({
+    id: user.id,
+    email
+  })
+ return res.status(200).json({ message: "User successfully login",
+ signature,
+role:user.role
+})
+}
+  }else{
+    return res.status(401).json({
+      Error : "User not verified"
+    })
+  }
+  return res.status(404).json({
+    Error : "User does not exist"
+  })
+} catch (error) {
+  console.log(error)
+  res.status(500).json({Error:"Internal Server Error"})
+}
+}
+
+//=====================RESET/CHANGE-PASSWORDS =============================//
