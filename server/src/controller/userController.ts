@@ -16,6 +16,7 @@ import {
 import UserModel, { UserAttributes } from "../model/userModel";
 import { v4 as uuidv4 } from "uuid";
 import { FROM_ADMIN_MAIL, MAIL_SUBJECT } from "../config";
+import { verifySignature } from "../utils/utility";
 
 //======================REGISTER USER ==========================//
 export const SignUp = async (req: Request, res: Response) => {
@@ -56,13 +57,14 @@ export const SignUp = async (req: Request, res: Response) => {
 
       //====send otp in mail===\\
       // const html = emailHtml(otp);
-
+     const signature = GenerateSignature(email)
       // await sendEmail(FROM_ADMIN_MAIL, email, MAIL_SUBJECT, html);
-
+      
       return res.status(201).json({
         message: "User Registered Successfully",
         success: true,
         newUser,
+        signature
       });
     }
     return res.status(400).json({
@@ -81,7 +83,7 @@ export const SignUp = async (req: Request, res: Response) => {
 export const verifyUserOtp = async (req: Request, res: Response) => {
   try {
     const { email, otp } = req.body;
-
+   
     if (!email || !otp) {
       return res.status(400).json({
         Error: "Email or Otp is empty",
@@ -91,22 +93,21 @@ export const verifyUserOtp = async (req: Request, res: Response) => {
     const user = (await UserModel.findOne({
       where: { email },
     })) as unknown as UserAttributes;
+
     if (user ) {
-      if (user.otp === parseInt(otp) && user.otp_expiry >= new Date()) {
+      if (user.dataValues.otp === parseInt(otp) && user.dataValues.otp_expiry >= new Date()) {
         const updateUser = (await UserModel.update(
           {
             verified: true,
           },
           { where: { email: email } }
         )) as unknown as UserAttributes;
-
+      
         if (updateUser) {
-          const user = (await UserModel.findOne({
-            where: { email },
-          })) as unknown as UserAttributes;
           return res.status(200).json({
             message: "User Verified Successfully",
             verified: user.verified,
+            
           });
         }
       }
@@ -143,9 +144,13 @@ export const postForgotPassword = async (req: Request, res: Response) => {
       const updateUser = (await UserModel.update(
         {
           otp,
+          otp_expiry: expiry
         },
         { where: { email: email } }
       )) as unknown as UserAttributes;
+      const signature =await GenerateSignature({
+        email
+      })
       if (updateUser) {
         const html = emailForgotPassword(otp);
 
@@ -154,7 +159,8 @@ export const postForgotPassword = async (req: Request, res: Response) => {
         message: "Reset Password Otp sent successfully",
         success: true,
         otp,
-        expiry
+        expiry,
+        signature
         });
       }
     }
@@ -178,12 +184,13 @@ try {
   const validated = await validatePassword(password,user.password,user.salt)
 if(validated){
   const signature =await GenerateSignature({
-    id: user.id,
+   
     email
   })
- return res.status(200).json({ message: "User successfully login",
+ return res.status(200).json({ 
+  message: "User successfully login",
  signature,
-role:user.role
+ role:user.role
 })
 }
   }else{
@@ -201,3 +208,16 @@ role:user.role
 }
 
 //=====================RESET/CHANGE-PASSWORDS =============================//
+export const postResetPassword = async(req: Request, res: Response)=>{
+  try { 
+    const{token}= req.params
+    const verified = verifySignature(token)
+ 
+
+    
+    
+  } catch (error) {
+    console.log(error)
+  res.status(500).json({Error:"Internal Server Error"})
+  }
+}

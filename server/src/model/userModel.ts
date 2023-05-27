@@ -3,6 +3,7 @@ import { DataTypes, Model } from "sequelize";
 import { sequelize } from "../config/db";
 
 export interface UserAttributes {
+  dataValues: any;
   id: string;
   email: string;
   password: string;

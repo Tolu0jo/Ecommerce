@@ -12,12 +12,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userLogin = exports.postForgotPassword = exports.verifyUserOtp = exports.SignUp = void 0;
+exports.postResetPassword = exports.userLogin = exports.postForgotPassword = exports.verifyUserOtp = exports.SignUp = void 0;
 const utility_1 = require("../utils/utility");
 const utility_2 = require("../utils/utility");
 const notification_1 = require("../utils/notification");
 const userModel_1 = __importDefault(require("../model/userModel"));
 const uuid_1 = require("uuid");
+const utility_3 = require("../utils/utility");
 //======================REGISTER USER ==========================//
 const SignUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -52,11 +53,13 @@ const SignUp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             });
             //====send otp in mail===\\
             // const html = emailHtml(otp);
+            const signature = (0, utility_1.GenerateSignature)(email);
             // await sendEmail(FROM_ADMIN_MAIL, email, MAIL_SUBJECT, html);
             return res.status(201).json({
                 message: "User Registered Successfully",
                 success: true,
                 newUser,
+                signature
             });
         }
         return res.status(400).json({
@@ -84,14 +87,11 @@ const verifyUserOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             where: { email },
         }));
         if (user) {
-            if (user.otp === parseInt(otp) && user.otp_expiry >= new Date()) {
+            if (user.dataValues.otp === parseInt(otp) && user.dataValues.otp_expiry >= new Date()) {
                 const updateUser = (yield userModel_1.default.update({
                     verified: true,
                 }, { where: { email: email } }));
                 if (updateUser) {
-                    const user = (yield userModel_1.default.findOne({
-                        where: { email },
-                    }));
                     return res.status(200).json({
                         message: "User Verified Successfully",
                         verified: user.verified,
@@ -129,7 +129,11 @@ const postForgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
         if (user) {
             const updateUser = (yield userModel_1.default.update({
                 otp,
+                otp_expiry: expiry
             }, { where: { email: email } }));
+            const signature = yield (0, utility_1.GenerateSignature)({
+                email
+            });
             if (updateUser) {
                 const html = (0, notification_1.emailForgotPassword)(otp);
                 //await sendEmail(FROM_ADMIN_MAIL, email, MAIL_SUBJECT, html);
@@ -137,7 +141,8 @@ const postForgotPassword = (req, res) => __awaiter(void 0, void 0, void 0, funct
                     message: "Reset Password Otp sent successfully",
                     success: true,
                     otp,
-                    expiry
+                    expiry,
+                    signature
                 });
             }
         }
@@ -161,10 +166,10 @@ const userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             const validated = yield (0, utility_1.validatePassword)(password, user.password, user.salt);
             if (validated) {
                 const signature = yield (0, utility_1.GenerateSignature)({
-                    id: user.id,
                     email
                 });
-                return res.status(200).json({ message: "User successfully login",
+                return res.status(200).json({
+                    message: "User successfully login",
                     signature,
                     role: user.role
                 });
@@ -185,3 +190,15 @@ const userLogin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.userLogin = userLogin;
+//=====================RESET/CHANGE-PASSWORDS =============================//
+const postResetPassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { token } = req.params;
+        const verified = (0, utility_3.verifySignature)(token);
+    }
+    catch (error) {
+        console.log(error);
+        res.status(500).json({ Error: "Internal Server Error" });
+    }
+});
+exports.postResetPassword = postResetPassword;

@@ -30,7 +30,7 @@ export const HashedPassword = async(password:string,salt:string)=>{
 }
 interface Ipayload{
     email:string;
-    id:string
+   
 }
 
 export const GenerateSignature = async(payload:Ipayload)=>{
@@ -39,4 +39,8 @@ export const GenerateSignature = async(payload:Ipayload)=>{
 
 export const validatePassword = async(enteredPassword:string, savedPassword: string, salt:string)=>{
     return await HashedPassword(enteredPassword,salt) === savedPassword
+}
+
+export const verifySignature= async(token:string)=> {
+    return jwt.verify(token,JWT_SECRET)
 }
